@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>...</title>
+    <title>Video Loop</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -29,18 +29,19 @@
 </head>
 <body class="bg-black text-white w-screen h-[100dvh] relative overflow-hidden flex items-center justify-center cursor-pointer select-none">
 
-    <!-- Indicador táctil inicial ultra minimalista sin esquinas redondeadas -->
-    <div id="startPrompt" class="z-10 px-8 py-5 border border-zinc-800 bg-black text-center">
+    <!-- Indicador táctil inicial -->
+    <div id="startPrompt" class="z-10 px-8 py-5 border border-zinc-800 bg-black text-center pointer-events-none">
         <p class="text-xs tracking-[0.25em] font-mono text-zinc-300 uppercase">TOCA LA PANTALLA</p>
     </div>
 
-    <!-- Elemento de video configurado para llenar la pantalla y sin controles -->
+    <!-- Elemento de video con opacity-0 en lugar de hidden y con muted inicial para precarga -->
     <video 
         id="loopVideo" 
-        class="absolute inset-0 w-full h-full object-cover hidden pointer-events-none"
+        class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 pointer-events-none"
         playsinline
         webkit-playsinline
         loop
+        muted
         preload="auto"
         src="https://files.catbox.moe/1eevl7.mp4">
     </video>
@@ -49,35 +50,29 @@
         const video = document.getElementById('loopVideo');
         const startPrompt = document.getElementById('startPrompt');
 
-        // Función ejecutada únicamente en el primer toque/clic
-        function handleFirstTouch(e) {
-            if (e) e.preventDefault();
-
-            // 1. Desaparece la pantalla inicial
-            startPrompt.remove();
-
-            // 2. Muestra el reproductor
-            video.classList.remove('hidden');
-
-            // 3. Activa el sonido (unmuted)
+        function handleFirstTouch() {
+            // 1. Desactivar el silencio
             video.muted = false;
 
-            // 4. Inicia la reproducción en bucle
-            video.play().catch(function(error) {
-                console.error("Error al iniciar la reproducción:", error);
-            });
+            // 2. Intentar reproducir el vídeo dentro del gesto del usuario
+            const playPromise = video.play();
 
-            // 5. Inhabilita interacciones táctiles posteriores para evitar pausar o alterar la reproducción
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    // Muestra el vídeo y quita el aviso solo si la reproducción comenzó con éxito
+                    startPrompt.remove();
+                    video.classList.remove('opacity-0');
+                }).catch(function(error) {
+                    console.error("Error al iniciar la reproducción:", error);
+                });
+            }
+
+            // 3. Inhabilitar interacciones posteriores
             document.body.style.pointerEvents = 'none';
-
-            // Elimina los escuchadores de eventos
-            window.removeEventListener('click', handleFirstTouch);
-            window.removeEventListener('touchstart', handleFirstTouch);
         }
 
-        // Se registra el primer evento táctil o de clic
-        window.addEventListener('click', handleFirstTouch, { once: true });
-        window.addEventListener('touchstart', handleFirstTouch, { once: true, passive: false });
+        // Se usa 'pointerdown' para unificar eventos táctiles y de clic sin perder la activación del usuario
+        window.addEventListener('pointerdown', handleFirstTouch, { once: true });
     </script>
 </body>
 </html>
