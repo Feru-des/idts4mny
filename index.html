@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Video Loop</title>
+    <title>...</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -34,7 +34,7 @@
         <p class="text-xs tracking-[0.25em] font-mono text-zinc-300 uppercase">TOCA LA PANTALLA</p>
     </div>
 
-    <!-- Elemento de video con opacity-0 en lugar de hidden y con muted inicial para precarga -->
+    <!-- Elemento de video con opacity-0 y muted inicial -->
     <video 
         id="loopVideo" 
         class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 pointer-events-none"
@@ -50,29 +50,44 @@
         const video = document.getElementById('loopVideo');
         const startPrompt = document.getElementById('startPrompt');
 
-        function handleFirstTouch() {
-            // 1. Desactivar el silencio
+        function startPlayback() {
+            // Intentar quitar silencio directamente en el gesto táctil
             video.muted = false;
 
-            // 2. Intentar reproducir el vídeo dentro del gesto del usuario
             const playPromise = video.play();
 
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    // Muestra el vídeo y quita el aviso solo si la reproducción comenzó con éxito
-                    startPrompt.remove();
+                    // Solo si la reproducción tuvo éxito se oculta el aviso y se bloquean eventos extra
+                    if (startPrompt) startPrompt.remove();
                     video.classList.remove('opacity-0');
+                    document.body.style.pointerEvents = 'none';
+
+                    cleanupListeners();
                 }).catch(function(error) {
-                    console.error("Error al iniciar la reproducción:", error);
+                    console.warn("Intento con audio bloqueado en móvil, aplicando fallback:", error);
+
+                    // Fallback para móviles con restricciones estrictas de audio
+                    video.muted = true;
+                    video.play().then(() => {
+                        video.muted = false; // Activar audio justo tras el arranque
+                        if (startPrompt) startPrompt.remove();
+                        video.classList.remove('opacity-0');
+                        document.body.style.pointerEvents = 'none';
+                        cleanupListeners();
+                    });
                 });
             }
-
-            // 3. Inhabilitar interacciones posteriores
-            document.body.style.pointerEvents = 'none';
         }
 
-        // Se usa 'pointerdown' para unificar eventos táctiles y de clic sin perder la activación del usuario
-        window.addEventListener('pointerdown', handleFirstTouch, { once: true });
+        function cleanupListeners() {
+            window.removeEventListener('click', startPlayback);
+            window.removeEventListener('touchstart', startPlayback);
+        }
+
+        // Se registran 'click' y 'touchstart' directamente para asegurar compatibilidad móvil
+        window.addEventListener('click', startPlayback);
+        window.addEventListener('touchstart', startPlayback, { passive: true });
     </script>
 </body>
 </html>
