@@ -1,192 +1,83 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-black text-white select-none">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>...</title>
-    
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Minimalist Loop Video</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    
+
     <style>
-        /* Desactivar selección, bordes redondeados y gestos globales */
-        * {
+        /* Eliminación absoluta de bordes redondeados y efectos táctiles nativos */
+        *, *::before, *::after {
             border-radius: 0px !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
             user-select: none;
-            touch-action: none !important;
+            -webkit-user-select: none;
         }
 
-        html, body {
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
+        body, html {
             margin: 0;
             padding: 0;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
             background-color: #000000;
-        }
-
-        /* Transición suave de opacidad para el efecto de desvanecimiento */
-        .slide-fade {
-            transition: opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Prevenir menú contextual de imagen y guardado táctil */
-        img {
-            -webkit-touch-callout: none;
-            -webkit-user-drag: none;
-            pointer-events: none !important;
+            font-family: monospace, system-ui, -apple-system, sans-serif;
         }
     </style>
 </head>
-<body class="h-[100dvh] w-full overflow-hidden bg-black text-white select-none relative" ondragstart="return false;" ondrop="return false;">
+<body class="bg-black text-white w-screen h-[100dvh] relative overflow-hidden flex items-center justify-center cursor-pointer select-none">
 
-    <!-- Audio en bucle totalmente invisible y sin controles -->
-    <audio id="bg-audio" loop preload="auto" playsinline>
-        <source src="./index.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- Pantalla inicial ultra minimalista requerida por navegadores móviles para habilitar el sonido -->
-    <div id="welcome-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black cursor-pointer transition-opacity duration-700 ease-out active:bg-black">
-        <div class="text-center space-y-4 p-6 pointer-events-none">
-            <p class="text-xs tracking-[0.35em] text-neutral-300 uppercase font-light">TOCA PARA ENTRAR</p>
-            <div class="w-6 h-[1px] bg-neutral-800 mx-auto"></div>
-        </div>
+    <!-- Indicador táctil inicial ultra minimalista sin esquinas redondeadas -->
+    <div id="startPrompt" class="z-10 px-8 py-5 border border-zinc-800 bg-black text-center">
+        <p class="text-xs tracking-[0.25em] font-mono text-zinc-300 uppercase">TOCA LA PANTALLA</p>
     </div>
 
-    <!-- Contenedor Principal (Bloqueo total de interacción táctil) -->
-    <main class="w-full h-full relative bg-black overflow-hidden pointer-events-none select-none">
-        
-        <!-- Apilamiento de las 8 diapositivas con efecto Fade (Crossfade) -->
-        <div id="slides-container" class="w-full h-full relative pointer-events-none">
-            
-            <!-- Diapositiva 1 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-100">
-                <img src="./in1.jpg" alt="Imagen 1" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 2 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in2.jpg" alt="Imagen 2" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 3 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in3.jpg" alt="Imagen 3" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 4 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in4.jpg" alt="Imagen 4" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 5 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in5.jpg" alt="Imagen 5" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 6 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in6.jpg" alt="Imagen 6" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 7 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in7.jpg" alt="Imagen 7" class="w-full h-full object-contain">
-            </div>
-
-            <!-- Diapositiva 8 -->
-            <div class="slide slide-fade absolute inset-0 w-full h-full flex items-center justify-center bg-black opacity-0">
-                <img src="./in8.jpg" alt="Imagen 8" class="w-full h-full object-contain">
-            </div>
-
-        </div>
-
-    </main>
+    <!-- Elemento de video configurado para llenar la pantalla y sin controles -->
+    <video 
+        id="loopVideo" 
+        class="absolute inset-0 w-full h-full object-cover hidden pointer-events-none"
+        playsinline
+        webkit-playsinline
+        loop
+        preload="auto"
+        src="./index.mp4">
+    </video>
 
     <script>
-        const TOTAL_SLIDES = 8;
-        const SLIDE_INTERVAL = 5000; // Cambio automático cada 5 segundos (5000 ms)
-        let currentIndex = 0;
-        let isStarted = false;
+        const video = document.getElementById('loopVideo');
+        const startPrompt = document.getElementById('startPrompt');
 
-        const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-        const audio = document.getElementById('bg-audio');
-        const welcomeOverlay = document.getElementById('welcome-overlay');
+        // Función ejecutada únicamente en el primer toque/clic
+        function handleFirstTouch(e) {
+            if (e) e.preventDefault();
 
-        function startExperience() {
-            if (isStarted) return;
-            isStarted = true;
+            // 1. Desaparece la pantalla inicial
+            startPrompt.remove();
 
-            // Forzar carga e inicio del audio directamente en la interacción activa
-            audio.volume = 1.0;
-            const playPromise = audio.play();
+            // 2. Muestra el reproductor
+            video.classList.remove('hidden');
 
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Error al reproducir audio:", error);
-                });
-            }
+            // 3. Activa el sonido (unmuted)
+            video.muted = false;
 
-            // Ocultar overlay inicial con desvanecimiento suave
-            welcomeOverlay.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                welcomeOverlay.style.display = 'none';
-            }, 700);
-
-            // Iniciar bucle automático de imágenes
-            setInterval(nextSlide, SLIDE_INTERVAL);
-        }
-
-        // Se usa click / pointerdown sin e.preventDefault() para garantizar que el navegador valide la acción
-        welcomeOverlay.addEventListener('click', startExperience, { once: true });
-        welcomeOverlay.addEventListener('touchend', startExperience, { once: true });
-
-        function nextSlide() {
-            // Ocultar slide actual
-            slides[currentIndex].classList.remove('opacity-100');
-            slides[currentIndex].classList.add('opacity-0');
-
-            // Incrementar índice circular
-            currentIndex = (currentIndex + 1) % TOTAL_SLIDES;
-
-            // Mostrar siguiente slide con efecto desvanecido
-            slides[currentIndex].classList.remove('opacity-0');
-            slides[currentIndex].classList.add('opacity-100');
-
-            // Actualizar estado visual de los indicadores (si existen en el HTML)
-            dots.forEach((dot, index) => {
-                if (index === currentIndex) {
-                    dot.className = "dot w-3 h-1.5 bg-white transition-all duration-500";
-                } else {
-                    dot.className = "dot w-1.5 h-1.5 bg-white/20 transition-all duration-500";
-                }
+            // 4. Inicia la reproducción en bucle
+            video.play().catch(function(error) {
+                console.error("Error al iniciar la reproducción:", error);
             });
+
+            // 5. Inhabilita interacciones táctiles posteriores para evitar pausar o alterar la reproducción
+            document.body.style.pointerEvents = 'none';
+
+            // Elimina los escuchadores de eventos
+            window.removeEventListener('click', handleFirstTouch);
+            window.removeEventListener('touchstart', handleFirstTouch);
         }
 
-        // Cancelar de forma estricta cualquier intento de deslizamiento o zoom posterior
-        const preventTouch = (e) => {
-            if (isStarted) {
-                if (e.cancelable) e.preventDefault();
-                e.stopPropagation();
-                return false;
-            }
-        };
-
-        // Escuchadores globales para prevenir interacción una vez iniciado
-        window.addEventListener('touchmove', preventTouch, { passive: false });
-        window.addEventListener('contextmenu', (e) => e.preventDefault());
-        window.addEventListener('dragstart', (e) => e.preventDefault());
+        // Se registra el primer evento táctil o de clic
+        window.addEventListener('click', handleFirstTouch, { once: true });
+        window.addEventListener('touchstart', handleFirstTouch, { once: true, passive: false });
     </script>
 </body>
 </html>
