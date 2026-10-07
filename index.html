@@ -51,7 +51,7 @@
 <body class="h-[100dvh] w-full overflow-hidden bg-black text-white select-none relative" ondragstart="return false;" ondrop="return false;">
 
     <!-- Audio en bucle totalmente invisible y sin controles -->
-    <audio id="bg-audio" loop preload="auto">
+    <audio id="bg-audio" loop preload="auto" playsinline>
         <source src="./index.mp3" type="audio/mpeg">
     </audio>
 
@@ -115,7 +115,7 @@
 
     <script>
         const TOTAL_SLIDES = 8;
-        const SLIDE_INTERVAL = 50000; // Cambio automático cada 5 segundos
+        const SLIDE_INTERVAL = 5000; // Cambio automático cada 5 segundos (5000 ms)
         let currentIndex = 0;
         let isStarted = false;
 
@@ -124,17 +124,19 @@
         const audio = document.getElementById('bg-audio');
         const welcomeOverlay = document.getElementById('welcome-overlay');
 
-        function startExperience(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+        function startExperience() {
             if (isStarted) return;
             isStarted = true;
 
-            // Iniciar audio en bucle
+            // Forzar carga e inicio del audio directamente en la interacción activa
             audio.volume = 1.0;
-            audio.play().catch(() => {});
+            const playPromise = audio.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Error al reproducir audio:", error);
+                });
+            }
 
             // Ocultar overlay inicial con desvanecimiento suave
             welcomeOverlay.classList.add('opacity-0', 'pointer-events-none');
@@ -146,9 +148,9 @@
             setInterval(nextSlide, SLIDE_INTERVAL);
         }
 
-        // Registrar entrada mediante tap/click inicial
+        // Se usa click / pointerdown sin e.preventDefault() para garantizar que el navegador valide la acción
         welcomeOverlay.addEventListener('click', startExperience, { once: true });
-        welcomeOverlay.addEventListener('touchstart', startExperience, { passive: false, once: true });
+        welcomeOverlay.addEventListener('touchend', startExperience, { once: true });
 
         function nextSlide() {
             // Ocultar slide actual
@@ -162,7 +164,7 @@
             slides[currentIndex].classList.remove('opacity-0');
             slides[currentIndex].classList.add('opacity-100');
 
-            // Actualizar estado visual de los indicadores inferiores
+            // Actualizar estado visual de los indicadores (si existen en el HTML)
             dots.forEach((dot, index) => {
                 if (index === currentIndex) {
                     dot.className = "dot w-3 h-1.5 bg-white transition-all duration-500";
@@ -172,7 +174,7 @@
             });
         }
 
-        // Cancelar de forma estricta cualquier intento de deslizamiento, toque, arrastre o zoom
+        // Cancelar de forma estricta cualquier intento de deslizamiento o zoom posterior
         const preventTouch = (e) => {
             if (isStarted) {
                 if (e.cancelable) e.preventDefault();
@@ -181,13 +183,8 @@
             }
         };
 
-        // Escuchadores globales para prevenir interacción
-        window.addEventListener('touchstart', preventTouch, { passive: false });
+        // Escuchadores globales para prevenir interacción una vez iniciado
         window.addEventListener('touchmove', preventTouch, { passive: false });
-        window.addEventListener('touchend', preventTouch, { passive: false });
-        window.addEventListener('touchcancel', preventTouch, { passive: false });
-        window.addEventListener('mousedown', preventTouch, { passive: false });
-        window.addEventListener('click', preventTouch, { passive: false });
         window.addEventListener('contextmenu', (e) => e.preventDefault());
         window.addEventListener('dragstart', (e) => e.preventDefault());
     </script>
